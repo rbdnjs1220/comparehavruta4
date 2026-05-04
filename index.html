@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>판소리와 경극</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Gowun+Batang:wght@400;700&display=swap');
+
+:root {
+  --ink: #5c3d1e;
+  --paper: #f5eed8;
+  --red: #c0392b;
+  --gold: #b8860b;
+  --stamp: #8b1a1a;
+  --light: #faf6ec;
+  --blue: #2c5f8a;
+  --green: #2d6a4f;
+  --teal: #2a7a6f;
+  --border: rgba(92,61,30,0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 15% 10%, #e8dfc0 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 90%, #ddd0a8 0%, transparent 55%);
+  font-family: 'Noto Serif KR', 'Gowun Batang', serif;
+  min-height: 100vh; color: var(--ink);
+}
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+#screen-login.active { display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+
+.nav {
+  position: sticky; top: 0; z-index: 50; background: var(--ink);
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; gap: 12px;
+}
+.nav-title { font-size: 13px; font-weight: 700; color: var(--paper); }
+.nav-title em { color: #f0c060; font-style: normal; }
+.nav-team { font-size: 11px; color: #c8b890; }
+.nav-btns { display: flex; gap: 8px; }
+.nav-btn {
+  font-family: 'Noto Serif KR', serif; font-size: 11px; font-weight: 700; padding: 5px 12px;
+  border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: var(--paper);
+  cursor: pointer; border-radius: 2px; transition: all 0.15s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.15); }
+.nav-btn.on { background: var(--red); border-color: var(--red); }
+
+.login-wrap { width: 100%; max-width: 440px; }
+.login-header { text-align: center; margin-bottom: 28px; }
+.tag { font-size: 11px; letter-spacing: 0.25em; color: var(--stamp); border: 1.5px solid var(--stamp); display: inline-block; padding: 3px 12px; margin-bottom: 12px; }
+.login-header h1 { font-size: clamp(18px,4vw,26px); font-weight: 900; line-height: 1.3; }
+.login-header .sub { font-size: 12px; color: #9a8a70; margin-top: 8px; line-height: 1.6; }
+.card { background: var(--light); border: 2px solid var(--ink); border-radius: 2px; box-shadow: 5px 5px 0 var(--ink); padding: 28px 32px; }
+
+label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; color: var(--stamp); display: block; margin-bottom: 6px; margin-top: 18px; text-transform: uppercase; }
+label:first-of-type { margin-top: 0; }
+input[type=text], input[type=password] {
+  width: 100%; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 2px;
+  background: var(--paper); font-family: 'Noto Serif KR', serif; font-size: 14px; color: var(--ink);
+}
+input:focus { outline: none; border-color: var(--red); }
+
+.sel-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.sel-btn {
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  border: 2px solid #c8bfa0; background: var(--paper); color: #7a6a50;
+  cursor: pointer; border-radius: 2px; transition: all 0.1s;
+  font-family: 'Noto Serif KR', serif; box-shadow: 2px 2px 0 #c8bfa0; user-select: none;
+}
+.sel-btn.on { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: 2px 2px 0 var(--gold); }
+#class-row { flex-wrap: nowrap; }
+.err { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 18px; }
+
+button {
+  font-family: 'Noto Serif KR', serif; font-size: 13px; font-weight: 700;
+  padding: 10px 24px; border: 2px solid var(--ink); background: var(--light); color: var(--ink);
+  cursor: pointer; border-radius: 2px; box-shadow: 3px 3px 0 var(--ink); transition: all 0.12s;
+}
+button:hover { background: var(--ink); color: var(--paper); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--gold); }
+button:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+button.primary { background: var(--red); color: #fff; border-color: var(--red); box-shadow: 3px 3px 0 #7a1010; }
+button.primary:hover { background: #a52a1a; }
+button.green-btn { background: var(--green); color: #fff; border-color: var(--green); box-shadow: 3px 3px 0 #1a4030; }
+button.green-btn:hover { background: #1e4d38; }
+.teacher-link { margin-top: 18px; text-align: center; font-size: 12px; color: #9a8a70; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+#screen-main { padding-bottom: 60px; }
+.content-wrap { max-width: 780px; margin: 0 auto; padding: 28px 20px 0; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* 참고영상 */
+.ref-box { background: rgba(44,95,138,0.05); border: 1.5px solid rgba(44,95,138,0.2); border-radius: 2px; padding: 18px 20px; margin-bottom: 28px; }
+.ref-box-title { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.1em; margin-bottom: 14px; text-transform: uppercase; }
+.ref-group { margin-bottom: 14px; }
+.ref-group:last-child { margin-bottom: 0; }
+.ref-group-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.ref-links { display: flex; flex-direction: column; gap: 6px; }
+.ref-link-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ref-link {
+  font-size: 12px; font-weight: 700; padding: 5px 12px;
+  border: 1.5px solid rgba(44,95,138,0.3); border-radius: 2px;
+  background: var(--paper); color: var(--blue); text-decoration: none;
+  transition: all 0.12s; font-family: 'Noto Serif KR', serif; white-space: nowrap;
+}
+.ref-link:hover { background: var(--blue); color: #fff; }
+.ref-hint { font-size: 11px; color: #9a8a70; }
+
+/* 섹션 */
+.section-block { margin-bottom: 36px; }
+.section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.section-head h3 { font-size: 15px; font-weight: 900; }
+.section-badge { font-size: 10px; color: #fff; padding: 2px 8px; border-radius: 2px; font-weight: 700; }
+.badge-teal { background: var(--teal); }
+.badge-red { background: var(--red); }
+.section-sub { font-size: 12px; color: #9a8a70; margin-bottom: 14px; line-height: 1.6; }
+
+/* 공통점 키워드 */
+.keyword-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+.ktag {
+  padding: 5px 13px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid #c8bfa0; background: var(--paper); color: #7a6a50;
+  cursor: pointer; border-radius: 20px; transition: all 0.12s;
+  font-family: 'Noto Serif KR', serif; user-select: none;
+}
+.ktag.sel-teal { background: var(--teal); color: #fff; border-color: var(--teal); }
+.common-reason {
+  width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 2px;
+  resize: vertical; min-height: 54px; background: var(--paper);
+  font-family: 'Noto Serif KR', serif; font-size: 12.5px; color: var(--ink); line-height: 1.6;
+}
+.common-reason:focus { outline: none; border-color: var(--teal); }
+
+/* 드래그 앤 드롭 키워드 */
+.dnd-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.dnd-pool-wrap {
+  background: rgba(92,61,30,0.04); border: 1.5px dashed rgba(92,61,30,0.25);
+  border-radius: 2px; padding: 14px 16px; grid-column: 1 / -1;
+}
+.dnd-pool-label { font-size: 11px; font-weight: 700; color: var(--stamp); letter-spacing: 0.1em; margin-bottom: 6px; text-transform: uppercase; }
+.dnd-pool-guide { font-size: 11px; color: #9a8a70; margin-bottom: 10px; }
+.dnd-pool { display: flex; flex-wrap: wrap; gap: 7px; min-height: 36px; }
+
+.dnd-drop-wrap {
+  background: var(--light); border: 2px solid var(--ink); border-radius: 2px; padding: 0; overflow: hidden;
+}
+.dnd-drop-header {
+  background: var(--ink); color: var(--paper); padding: 8px 14px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+}
+.dnd-drop-zone {
+  min-height: 60px; padding: 10px 12px;
+  display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start;
+  transition: background 0.15s;
+}
+.dnd-drop-zone.drag-over { background: rgba(42,122,111,0.1); border: 2px dashed var(--teal); }
+.dnd-placeholder { font-size: 11px; color: #bbb0a0; font-style: italic; align-self: center; }
+
+/* 드래그 태그 */
+.dtag {
+  padding: 5px 11px; font-size: 12px; font-weight: 600; border-radius: 20px;
+  cursor: grab; user-select: none; touch-action: none;
+  display: inline-flex; align-items: center;
+  transition: opacity 0.15s, transform 0.15s;
+  font-family: 'Noto Serif KR', serif;
+}
+.dtag.in-pool { border: 1.5px solid #c8bfa0; background: var(--paper); color: #7a6a50; }
+.dtag.in-pool:hover { border-color: var(--ink); color: var(--ink); }
+.dtag.in-drop { background: var(--red); color: #fff; border: none; }
+.dtag.in-drop::after { content: ' ×'; font-size: 12px; opacity: 0.8; }
+.dtag.dragging { opacity: 0.4; transform: scale(0.95); }
+
+/* 고스트 */
+#drag-ghost {
+  position: fixed; pointer-events: none; z-index: 9999;
+  padding: 5px 13px; font-size: 12px; font-weight: 600; border-radius: 20px;
+  background: var(--ink); color: var(--paper);
+  font-family: 'Noto Serif KR', serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: none; transform: translate(-50%,-50%);
+}
+
+/* 비교표 텍스트 영역 */
+.diff-table { width: 100%; border-collapse: collapse; border: 2px solid var(--ink); }
+.diff-table th { background: var(--ink); color: var(--paper); padding: 11px 14px; font-size: 12.5px; font-weight: 700; text-align: center; }
+.diff-table th.item-col { width: 24%; text-align: left; }
+.diff-table td { padding: 0; border: 1px solid rgba(92,61,30,0.2); vertical-align: top; }
+.diff-table td.item-label { padding: 13px 14px; font-size: 12.5px; font-weight: 700; background: rgba(92,61,30,0.05); color: var(--stamp); vertical-align: middle; }
+.diff-table textarea {
+  width: 100%; min-height: 64px; padding: 10px 13px; border: none; resize: vertical;
+  background: transparent; font-family: 'Noto Serif KR', serif; font-size: 12.5px; color: var(--ink); line-height: 1.65;
+}
+.diff-table textarea:focus { outline: none; background: rgba(192,57,43,0.03); }
+
+.save-area { text-align: center; margin-top: 28px; }
+.save-hint { font-size: 12px; color: #9a8a70; margin-top: 8px; }
+
+/* 게시판 */
+.board-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+.board-top h2 { font-size: 17px; font-weight: 900; }
+.board-count { font-size: 12px; color: #9a8a70; }
+.board-count strong { color: var(--red); font-weight: 900; }
+.post-card { background: var(--light); border: 2px solid var(--ink); border-radius: 2px; margin-bottom: 16px; box-shadow: 4px 4px 0 rgba(92,61,30,0.13); overflow: hidden; transition: transform 0.15s, box-shadow 0.15s; }
+.post-card:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(92,61,30,0.2); }
+.post-head { background: var(--ink); color: var(--paper); padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.post-head-left { display: flex; flex-direction: column; gap: 2px; }
+.post-team-name { font-size: 13px; font-weight: 700; }
+.post-team-name em { color: #f0c060; font-style: normal; }
+.post-time { font-size: 10px; color: #c8b890; }
+.post-head-right { display: flex; gap: 6px; flex-shrink: 0; }
+.post-action-btn { font-family: 'Noto Serif KR', serif; font-size: 11px; font-weight: 700; padding: 4px 10px; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: var(--paper); cursor: pointer; border-radius: 2px; box-shadow: none; transition: all 0.12s; }
+.post-action-btn:hover { background: rgba(255,255,255,0.2); transform: none; box-shadow: none; }
+.post-action-btn.del { border-color: rgba(192,57,43,0.6); color: #ffaaaa; }
+.post-action-btn.del:hover { background: var(--red); color: #fff; border-color: var(--red); }
+.post-body { padding: 18px 20px; }
+.post-section { margin-bottom: 18px; }
+.post-section:last-child { margin-bottom: 0; }
+.post-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--stamp); margin-bottom: 8px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+.post-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.post-tag-teal { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: rgba(42,122,111,0.12); color: var(--teal); font-weight: 600; }
+.post-tag-red { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: rgba(192,57,43,0.1); color: var(--red); font-weight: 600; }
+.post-common-reason { font-size: 12px; color: #2a7a6f; line-height: 1.6; font-style: italic; margin-bottom: 10px; }
+.post-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.pcol-title { font-size: 10px; font-weight: 700; color: #9a8a70; margin-bottom: 4px; }
+.pcol-item { font-size: 12px; line-height: 1.6; color: #5a4030; margin-bottom: 3px; }
+.pcol-item span { font-weight: 700; color: var(--ink); }
+/* 댓글 */
+.comment-section { border-top: 1px solid var(--border); padding: 14px 18px; background: rgba(92,61,30,0.02); }
+.comment-section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--stamp); margin-bottom: 12px; text-transform: uppercase; }
+.comment-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.comment-item { padding: 8px 12px; border-radius: 2px; font-size: 12px; line-height: 1.6; display: flex; flex-direction: column; gap: 3px; }
+.comment-item.q-type { background: rgba(44,95,138,0.08); border-left: 3px solid var(--blue); }
+.comment-item.a-type { background: rgba(42,122,111,0.08); border-left: 3px solid var(--teal); }
+.comment-meta { font-size: 10px; color: #9a8a70; display: flex; justify-content: space-between; align-items: center; }
+.comment-type-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+.q-badge-c { background: var(--blue); color: #fff; }
+.a-badge-c { background: var(--teal); color: #fff; }
+.comment-del { font-size: 10px; color: #bbb0a0; cursor: pointer; }
+.comment-del:hover { color: var(--red); }
+.comment-form { display: flex; flex-direction: column; gap: 8px; }
+.comment-type-row { display: flex; gap: 8px; }
+.ctype-btn {
+  padding: 5px 14px; font-size: 12px; font-weight: 700; border-radius: 20px;
+  border: 1.5px solid #c8bfa0; background: var(--paper); color: #7a6a50;
+  cursor: pointer; font-family: 'Noto Serif KR', serif; transition: all 0.12s;
+}
+.ctype-btn.on-q { background: var(--blue); color: #fff; border-color: var(--blue); }
+.ctype-btn.on-a { background: var(--teal); color: #fff; border-color: var(--teal); }
+.comment-input-row { display: flex; gap: 8px; }
+.comment-input {
+  flex: 1; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 2px;
+  font-family: 'Noto Serif KR', serif; font-size: 12.5px; color: var(--ink);
+  background: var(--paper); resize: none; min-height: 40px;
+}
+.comment-input:focus { outline: none; border-color: var(--blue); }
+.comment-submit {
+  font-family: 'Noto Serif KR', serif; font-size: 12px; font-weight: 700;
+  padding: 8px 16px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper);
+  cursor: pointer; border-radius: 2px; white-space: nowrap; box-shadow: none; transition: all 0.12s;
+}
+.comment-submit:hover { background: var(--stamp); transform: none; box-shadow: none; }
+.empty-board { text-align: center; padding: 60px; color: #9a8a70; font-size: 14px; }
+
+.overlay { display: none; position: fixed; inset: 0; background: rgba(92,61,30,0.72); z-index: 200; align-items: center; justify-content: center; }
+.overlay.show { display: flex; animation: fadeIn 0.2s; }
+.ov-box { background: var(--paper); border: 3px solid var(--ink); padding: 32px 36px; text-align: center; box-shadow: 8px 8px 0 var(--ink); border-radius: 2px; max-width: 340px; width: 90%; }
+.ov-box h2 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+.ov-box p { font-size: 13px; color: #7a6a50; margin-bottom: 20px; line-height: 1.6; }
+.btn-row { display: flex; gap: 10px; justify-content: center; }
+
+@keyframes fadeIn { from{opacity:0}to{opacity:1} }
+
+@media(max-width:580px) {
+  .card { padding: 22px 18px; }
+  .content-wrap { padding: 20px 14px 0; }
+  .nav { padding: 10px 14px; }
+  .post-compare-grid { grid-template-columns: 1fr; }
+  .dnd-layout { grid-template-columns: 1fr; }
+  .dnd-drop-wrap { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+
+<div id="drag-ghost"></div>
+
+<!-- 로그인 -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-header">
+      <div class="tag">4차시 · 활동 3</div>
+      <h1>판소리와 경극 비교하기</h1>
+      <p class="sub">학년·반·팀명을 입력하고 활동을 시작하세요<br>같은 팀명으로 입력하면 짝과 같은 방에 입장해요</p>
+    </div>
+    <div class="card">
+      <label>학년</label>
+      <div class="sel-row" id="grade-row">
+        <div class="sel-btn" onclick="pick(this,'grade-row','grade')">1학년</div>
+        <div class="sel-btn" onclick="pick(this,'grade-row','grade')">2학년</div>
+        <div class="sel-btn" onclick="pick(this,'grade-row','grade')">3학년</div>
+      </div>
+      <label>반</label>
+      <div class="sel-row" id="class-row">
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">1반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">2반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">3반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">4반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">5반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">6반</div>
+        <div class="sel-btn" onclick="pick(this,'class-row','class')">7반</div>
+      </div>
+      <label>팀명</label>
+      <input type="text" id="team-input" placeholder="예) 춘향팀, 항우팀">
+      <label>내 이름</label>
+      <input type="text" id="name-input" placeholder="예) 홍길동">
+      <div class="err" id="login-err"></div>
+      <div style="margin-top:24px">
+        <button class="primary" style="width:100%" onclick="enterRoom()">입장하기 →</button>
+      </div>
+    </div>
+    <div class="teacher-link" onclick="openTeacherLogin()">선생님 전체보기</div>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div id="screen-main" class="screen">
+  <nav class="nav">
+    <div>
+      <div class="nav-title">판소리와 경극 비교하기</div>
+      <div class="nav-team" id="nav-label">—</div>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-btn on" id="btn-write" onclick="switchTab('write')">✏️ 우리 팀</button>
+      <button class="nav-btn" id="btn-board" onclick="switchTab('board')">📋 전체보기</button>
+    </div>
+  </nav>
+
+  <div class="content-wrap">
+    <div id="tab-write" class="tab-pane active">
+
+      <!-- 참고 영상 -->
+      <div class="ref-box">
+        <div class="ref-box-title">🎬 참고 영상</div>
+        <div class="ref-group">
+          <div class="ref-group-title">🎵 사랑가 (판소리)</div>
+          <div class="ref-links">
+            <div class="ref-link-row">
+              <a class="ref-link" href="https://www.youtube.com/watch?v=UI_lz_o62dM&t=57s" target="_blank">소리 구간</a>
+              <span class="ref-hint">1:43까지 들어보세요</span>
+            </div>
+            <div class="ref-link-row">
+              <a class="ref-link" href="https://www.youtube.com/watch?v=UI_lz_o62dM&t=20s" target="_blank">아니리 구간 1</a>
+              <span class="ref-hint">0:56까지 들어보세요</span>
+            </div>
+            <div class="ref-link-row">
+              <a class="ref-link" href="https://www.youtube.com/watch?v=UI_lz_o62dM&t=170s" target="_blank">아니리 구간 2</a>
+              <span class="ref-hint">3:20까지 들어보세요</span>
+            </div>
+          </div>
+        </div>
+        <div class="ref-group">
+          <div class="ref-group-title">🎭 해하가 (경극)</div>
+          <div class="ref-links">
+            <div class="ref-link-row">
+              <a class="ref-link" href="https://www.youtube.com/watch?v=WrXfW6cnil4&t=6300s" target="_blank">창 구간</a>
+              <span class="ref-hint">1:46:00까지 들어보세요</span>
+            </div>
+            <div class="ref-link-row">
+              <a class="ref-link" href="https://www.youtube.com/watch?v=WrXfW6cnil4&t=6360s" target="_blank">염 구간</a>
+              <span class="ref-hint">1:46:50까지 들어보세요</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 소리 ↔ 창 -->
+      <div class="section-block">
+        <div class="section-head"><h3>🎵 소리 ↔ 창(唱)</h3></div>
+
+        <!-- Step 1 공통점 -->
+        <div style="margin-bottom:24px">
+          <div class="section-head">
+            <span style="font-size:13px;font-weight:900">공통점 찾기</span>
+            <span class="section-badge badge-teal">Step 1</span>
+          </div>
+          <p class="section-sub">소리와 창의 공통점에 해당하는 키워드를 1개 이상 골라보세요</p>
+          <div class="keyword-tags" id="tags-s-common">
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#노래로전달</span>
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#감정표현</span>
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#훈련된발성</span>
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#선율</span>
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#공연의핵심</span>
+            <span class="ktag" onclick="toggleCommon(this,'s-common')">#이야기를담은소리</span>
+          </div>
+          <textarea class="common-reason" id="s-reason" placeholder="선택한 키워드를 바탕으로 공통점을 한 문장으로 써보세요"></textarea>
+        </div>
+
+        <!-- Step 2 차이점 -->
+        <div>
+          <div class="section-head">
+            <span style="font-size:13px;font-weight:900">차이점 찾기</span>
+            <span class="section-badge badge-red">Step 2</span>
+          </div>
+          <p class="section-sub">키워드를 드래그해서 소리 / 창 칸에 놓아보세요. 배치된 키워드를 다시 드래그하면 풀로 돌아와요.</p>
+
+          <div class="dnd-layout">
+            <div class="dnd-pool-wrap">
+              <div class="dnd-pool-label">🏷 키워드 풀</div>
+              <div class="dnd-pool-guide">아래 키워드를 드래그해서 소리 / 창 칸에 4개씩 배치해보세요</div>
+              <div class="dnd-pool" id="pool-voice" data-group="voice" data-zone="pool">
+                <span class="dtag in-pool" draggable="true" data-tag="#거칠다">#거칠다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#가늘다">#가늘다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#굵다">#굵다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#높다">#높다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#힘차다">#힘차다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#날카롭다">#날카롭다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#구성지다">#구성지다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#맑다">#맑다</span>
+              </div>
+            </div>
+            <div class="dnd-drop-wrap">
+              <div class="dnd-drop-header">판소리 — 소리의 특징</div>
+              <div class="dnd-drop-zone" id="drop-voice-left" data-group="voice" data-zone="left">
+                <span class="dnd-placeholder">여기에 드래그해서 놓으세요</span>
+              </div>
+            </div>
+            <div class="dnd-drop-wrap">
+              <div class="dnd-drop-header">경극 — 창의 특징</div>
+              <div class="dnd-drop-zone" id="drop-voice-right" data-group="voice" data-zone="right">
+                <span class="dnd-placeholder">여기에 드래그해서 놓으세요</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 아니리 ↔ 염 -->
+      <div class="section-block">
+        <div class="section-head"><h3>💬 아니리 ↔ 염(念)</h3></div>
+
+        <!-- Step 1 공통점 -->
+        <div style="margin-bottom:24px">
+          <div class="section-head">
+            <span style="font-size:13px;font-weight:900">공통점 찾기</span>
+            <span class="section-badge badge-teal">Step 1</span>
+          </div>
+          <p class="section-sub">아니리와 염의 공통점에 해당하는 키워드를 1개 이상 골라보세요</p>
+          <div class="keyword-tags" id="tags-a-common">
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#말로전달</span>
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#장면전환</span>
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#인물묘사</span>
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#노래없이</span>
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#1인다역</span>
+            <span class="ktag" onclick="toggleCommon(this,'a-common')">#이야기진행</span>
+          </div>
+          <textarea class="common-reason" id="a-reason" placeholder="선택한 키워드를 바탕으로 공통점을 한 문장으로 써보세요"></textarea>
+        </div>
+
+        <!-- Step 2 차이점 -->
+        <div>
+          <div class="section-head">
+            <span style="font-size:13px;font-weight:900">차이점 찾기</span>
+            <span class="section-badge badge-red">Step 2</span>
+          </div>
+          <p class="section-sub">키워드를 드래그해서 아니리 / 염 칸에 놓아보세요</p>
+
+          <div class="dnd-layout">
+            <div class="dnd-pool-wrap">
+              <div class="dnd-pool-label">🏷 키워드 풀</div>
+              <div class="dnd-pool-guide">아래 키워드를 드래그해서 아니리 / 염 칸에 3개씩 배치해보세요</div>
+              <div class="dnd-pool" id="pool-tone" data-group="tone" data-zone="pool">
+                <span class="dtag in-pool" draggable="true" data-tag="#자연스럽다">#자연스럽다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#격식있다">#격식있다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#시적이다">#시적이다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#리듬감있다">#리듬감있다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#즉흥적이다">#즉흥적이다</span>
+                <span class="dtag in-pool" draggable="true" data-tag="#친근하다">#친근하다</span>
+              </div>
+            </div>
+            <div class="dnd-drop-wrap">
+              <div class="dnd-drop-header">판소리 — 아니리의 특징</div>
+              <div class="dnd-drop-zone" id="drop-tone-left" data-group="tone" data-zone="left">
+                <span class="dnd-placeholder">여기에 드래그해서 놓으세요</span>
+              </div>
+            </div>
+            <div class="dnd-drop-wrap">
+              <div class="dnd-drop-header">경극 — 염의 특징</div>
+              <div class="dnd-drop-zone" id="drop-tone-right" data-group="tone" data-zone="right">
+                <span class="dnd-placeholder">여기에 드래그해서 놓으세요</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="save-area">
+        <button class="green-btn" onclick="savePost()">전체 게시판에 올리기 ✓</button>
+        <p class="save-hint">올린 후에도 수정하고 다시 올릴 수 있어요</p>
+      </div>
+    </div>
+
+    <!-- 전체 게시판 -->
+    <div id="tab-board" class="tab-pane">
+      <div class="board-top">
+        <h2>전체 게시판</h2>
+        <span class="board-count">게시물 <strong id="post-count">0</strong>개</span>
+      </div>
+      <div id="board-list">
+        <div class="empty-board">아직 올라온 게시물이 없어요</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: 선생님 -->
+<div class="overlay" id="teacher-overlay">
+  <div class="ov-box">
+    <h2>선생님 전체보기</h2>
+    <p>비밀번호를 입력하세요</p>
+    <input type="password" id="teacher-pw" placeholder="비밀번호"
+      onkeydown="if(event.key==='Enter')checkTeacherPw()" style="margin-bottom:6px">
+    <div class="err" id="teacher-err"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button onclick="document.getElementById('teacher-overlay').classList.remove('show')">취소</button>
+      <button class="primary" onclick="checkTeacherPw()">입장</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: 저장 완료 -->
+<div class="overlay" id="saved-overlay">
+  <div class="ov-box">
+    <h2>🎉 게시 완료!</h2>
+    <p>전체 게시판에 올라갔어요.</p>
+    <div class="btn-row">
+      <button onclick="closeSaved('board')">전체보기 →</button>
+      <button class="primary" onclick="closeSaved('write')">계속 수정</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: 삭제 확인 -->
+<div class="overlay" id="delete-overlay">
+  <div class="ov-box">
+    <h2>삭제할까요?</h2>
+    <p>게시물을 삭제하면 되돌릴 수 없어요.</p>
+    <div class="btn-row">
+      <button onclick="document.getElementById('delete-overlay').classList.remove('show')">취소</button>
+      <button class="primary" onclick="confirmDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEACHER_PW = '1234';
+const STORAGE_KEY = 'compare1_v4';
+let selGrade = null, selClass = null, teamName = '', myName = '';
+let deleteTargetKey = null, isTeacher = false;
+let commonTags = { 's-common': new Set(), 'a-common': new Set() };
+
+// 배치 상태: { voice: { pool: Set, left: Set, right: Set }, tone: { ... } }
+let placed = {
+  voice: { pool: new Set(['#거칠다','#가늘다','#굵다','#높다','#힘차다','#날카롭다','#구성지다','#맑다']), left: new Set(), right: new Set() },
+  tone:  { pool: new Set(['#자연스럽다','#격식있다','#시적이다','#리듬감있다','#즉흥적이다','#친근하다']), left: new Set(), right: new Set() }
+};
+
+// ── 드래그 앤 드롭 ────────────────────────────────────────────────
+let dragState = { tag: null, group: null, fromZone: null, el: null };
+const ghost = document.getElementById('drag-ghost');
+
+function initDnD() {
+  document.querySelectorAll('.dtag').forEach(el => {
+    el.addEventListener('dragstart', onDragStart);
+    el.addEventListener('dragend', onDragEnd);
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+  });
+  document.querySelectorAll('.dnd-pool, .dnd-drop-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', onDrop);
+  });
+}
+
+function onDragStart(e) {
+  const el = e.currentTarget;
+  dragState = { tag: el.dataset.tag, group: el.closest('[data-group]').dataset.group, fromZone: el.closest('[data-zone]').dataset.zone, el };
+  el.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(z => z.classList.remove('drag-over'));
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const zone = e.currentTarget;
+  zone.classList.remove('drag-over');
+  const toZone = zone.dataset.zone;
+  const group  = zone.dataset.group;
+  if (!dragState.tag || group !== dragState.group) return;
+  if (dragState.fromZone === toZone) return;
+  moveTag(dragState.group, dragState.fromZone, toZone, dragState.tag);
+  dragState = { tag: null, group: null, fromZone: null, el: null };
+}
+
+// 터치 드래그
+let touchState = { tag: null, group: null, fromZone: null, el: null };
+
+function onTouchStart(e) {
+  const el = e.currentTarget;
+  touchState = { tag: el.dataset.tag, group: el.closest('[data-group]').dataset.group, fromZone: el.closest('[data-zone]').dataset.zone, el };
+  ghost.textContent = el.dataset.tag;
+  ghost.style.display = 'block';
+  el.classList.add('dragging');
+  updateGhostPos(e.touches[0]);
+}
+
+function onTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  updateGhostPos(t);
+  // 드롭 존 하이라이트
+  document.querySelectorAll('.dnd-pool, .dnd-drop-zone').forEach(z => z.classList.remove('drag-over'));
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const zone = el?.closest('.dnd-pool, .dnd-drop-zone');
+  if (zone) zone.classList.add('drag-over');
+}
+
+function onTouchEnd(e) {
+  ghost.style.display = 'none';
+  touchState.el?.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(z => z.classList.remove('drag-over'));
+
+  const t = e.changedTouches[0];
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const zone = el?.closest('.dnd-pool, .dnd-drop-zone');
+  if (!zone || !touchState.tag) return;
+
+  const toZone = zone.dataset.zone;
+  const group  = zone.dataset.group;
+  if (!group || group !== touchState.group) return;
+  if (touchState.fromZone === toZone) return;
+  moveTag(touchState.group, touchState.fromZone, toZone, touchState.tag);
+  touchState = { tag: null, group: null, fromZone: null, el: null };
+}
+
+function updateGhostPos(touch) {
+  ghost.style.left = touch.clientX + 'px';
+  ghost.style.top  = touch.clientY + 'px';
+}
+
+function moveTag(group, from, to, tag) {
+  placed[group][from].delete(tag);
+  placed[group][to].add(tag);
+  renderDnD(group);
+}
+
+function renderDnD(group) {
+  const poolId  = group === 'voice' ? 'pool-voice' : 'pool-tone';
+  const leftId  = `drop-${group}-left`;
+  const rightId = `drop-${group}-right`;
+
+  renderZone(poolId,  placed[group].pool,  group, 'pool',  'in-pool');
+  renderZone(leftId,  placed[group].left,  group, 'left',  'in-drop');
+  renderZone(rightId, placed[group].right, group, 'right', 'in-drop');
+}
+
+function renderZone(containerId, tagSet, group, zone, cls) {
+  const container = document.getElementById(containerId);
+  if (!tagSet.size) {
+    container.innerHTML = zone === 'pool'
+      ? ''
+      : '<span class="dnd-placeholder">여기에 드래그해서 놓으세요</span>';
+    return;
+  }
+  container.innerHTML = [...tagSet].map(tag =>
+    `<span class="dtag ${cls}" draggable="true" data-tag="${tag}">${tag}</span>`
+  ).join('');
+  container.querySelectorAll('.dtag').forEach(el => {
+    el.addEventListener('dragstart', onDragStart);
+    el.addEventListener('dragend', onDragEnd);
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+  });
+}
+
+// ── 공통점 키워드 ─────────────────────────────────────────────────
+function toggleCommon(el, group) {
+  el.classList.toggle('sel-teal');
+  const tag = el.textContent;
+  if (commonTags[group].has(tag)) commonTags[group].delete(tag);
+  else commonTags[group].add(tag);
+}
+
+function restoreCommonTags(group, arr) {
+  commonTags[group] = new Set(arr);
+  document.querySelectorAll(`#tags-${group} .ktag`).forEach(el => {
+    el.classList.toggle('sel-teal', commonTags[group].has(el.textContent));
+  });
+}
+
+// ── 로그인 ────────────────────────────────────────────────────────
+function pick(el, rowId, type) {
+  document.querySelectorAll(`#${rowId} .sel-btn`).forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if (type === 'grade') selGrade = el.textContent;
+  else selClass = el.textContent;
+}
+
+function enterRoom() {
+  const team = document.getElementById('team-input').value.trim();
+  const name = document.getElementById('name-input').value.trim();
+  const err  = document.getElementById('login-err');
+  if (!selGrade) { err.textContent = '학년을 선택해주세요.'; return; }
+  if (!selClass) { err.textContent = '반을 선택해주세요.'; return; }
+  if (!team)     { err.textContent = '팀명을 입력해주세요.'; return; }
+  if (!name)     { err.textContent = '이름을 입력해주세요.'; return; }
+  err.textContent = '';
+  teamName = team; myName = name;
+  document.getElementById('nav-label').textContent = `${selGrade} ${selClass} · ${teamName} (${myName})`;
+
+  const posts = getPosts();
+  const key = makeKey();
+  if (posts[key]) loadFromData(posts[key]);
+
+  showScreen('screen-main');
+  renderBoard();
+}
+
+function makeKey() { return `${selGrade}_${selClass}_${teamName}`; }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(`btn-${tab}`).classList.add('on');
+  if (tab === 'board') renderBoard();
+}
+
+// ── 저장/불러오기 ─────────────────────────────────────────────────
+function getPosts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function loadFromData(d) {
+  document.getElementById('s-reason').value = d.s_reason || '';
+  document.getElementById('a-reason').value = d.a_reason || '';
+  restoreCommonTags('s-common', d.tags_s_common || []);
+  restoreCommonTags('a-common', d.tags_a_common || []);
+
+  // 배치 복원
+  const allVoice = ['#거칠다','#가늘다','#굵다','#높다','#힘차다','#날카롭다','#구성지다','#맑다'];
+  const allTone  = ['#자연스럽다','#격식있다','#시적이다','#리듬감있다','#즉흥적이다','#친근하다'];
+
+  const vl = new Set(d.voice_left  || []);
+  const vr = new Set(d.voice_right || []);
+  placed.voice.left  = vl;
+  placed.voice.right = vr;
+  placed.voice.pool  = new Set(allVoice.filter(t => !vl.has(t) && !vr.has(t)));
+
+  const tl = new Set(d.tone_left  || []);
+  const tr = new Set(d.tone_right || []);
+  placed.tone.left  = tl;
+  placed.tone.right = tr;
+  placed.tone.pool  = new Set(allTone.filter(t => !tl.has(t) && !tr.has(t)));
+
+  renderDnD('voice');
+  renderDnD('tone');
+}
+
+function savePost() {
+  const posts = getPosts();
+  const now = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const key = makeKey();
+  posts[key] = {
+    grade: selGrade, classNum: selClass, team: teamName, name: myName,
+    s_reason: document.getElementById('s-reason').value.trim(),
+    a_reason: document.getElementById('a-reason').value.trim(),
+    tags_s_common: [...commonTags['s-common']],
+    tags_a_common: [...commonTags['a-common']],
+    voice_left:  [...placed.voice.left],
+    voice_right: [...placed.voice.right],
+    tone_left:   [...placed.tone.left],
+    tone_right:  [...placed.tone.right],
+    ts: posts[key]?.ts || Date.now(),
+    updatedAt: now
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  document.getElementById('saved-overlay').classList.add('show');
+}
+
+function closeSaved(tab) {
+  document.getElementById('saved-overlay').classList.remove('show');
+  switchTab(tab);
+}
+
+function askDelete(key) {
+  deleteTargetKey = key;
+  document.getElementById('delete-overlay').classList.add('show');
+}
+
+function confirmDelete() {
+  if (!deleteTargetKey) return;
+  const posts = getPosts();
+  delete posts[deleteTargetKey];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  deleteTargetKey = null;
+  document.getElementById('delete-overlay').classList.remove('show');
+  renderBoard();
+}
+
+function editPost(key) {
+  const posts = getPosts();
+  const d = posts[key];
+  if (!d) return;
+  loadFromData(d);
+  if (!isTeacher) switchTab('write');
+}
+
+function renderBoard() {
+  const posts = Object.entries(getPosts()).map(([key,val]) => ({key,...val})).sort((a,b) => a.ts - b.ts);
+  const list = document.getElementById('board-list');
+  document.getElementById('post-count').textContent = posts.length;
+
+  if (!posts.length) {
+    list.innerHTML = '<div class="empty-board">아직 올라온 게시물이 없어요</div>';
+    return;
+  }
+
+  const myKey = isTeacher ? null : makeKey();
+  list.innerHTML = posts.map(p => {
+    const isMine = p.key === myKey;
+    const actionBtns = isMine || isTeacher ? `
+      <button class="post-action-btn" onclick="editPost('${p.key}')">✏️ 수정</button>
+      <button class="post-action-btn del" onclick="askDelete('${p.key}')">✕ 삭제</button>` : '';
+    const teal = arr => (arr||[]).map(t=>`<span class="post-tag-teal">${t}</span>`).join('');
+    const red  = arr => (arr||[]).map(t=>`<span class="post-tag-red">${t}</span>`).join('');
+
+    return `<div class="post-card">
+      <div class="post-head">
+        <div class="post-head-left">
+          <span class="post-team-name"><em>${p.grade} ${p.classNum}</em> · ${p.team}</span>
+          <span class="post-time">${p.updatedAt||''}</span>
+        </div>
+        <div class="post-head-right">${actionBtns}</div>
+      </div>
+      <div class="post-body">
+        <div class="post-section">
+          <div class="post-section-title">🎵 소리 ↔ 창</div>
+          ${p.s_reason ? `<div class="post-common-reason">"${p.s_reason}"</div>` : ''}
+        </div>
+        <div class="post-section">
+          <div class="post-section-title">💬 아니리 ↔ 염</div>
+          ${p.a_reason ? `<div class="post-common-reason">"${p.a_reason}"</div>` : ''}
+        </div>
+      </div>
+      <div class="comment-section">
+        <div class="comment-section-title">💬 하브루타 질문 & 답변 — 공통점 문장에 질문을 달아보세요!</div>
+        <p style="font-size:11px;color:#9a8a70;margin-bottom:10px;line-height:1.6">예시) 소리와 창이 둘 다 선율로 감정을 표현한다면, 어떤 감정을 표현할 때 가장 잘 어울릴 것 같나요?</p>
+        <div class="comment-list" id="comments-${p.key}">${renderComments(p.key)}</div>
+        <div class="comment-form">
+          <div class="comment-type-row">
+            <button class="ctype-btn" id="ctype-q-${p.key}" onclick="setCtype('${p.key}','q')">💬 질문</button>
+            <button class="ctype-btn" id="ctype-a-${p.key}" onclick="setCtype('${p.key}','a')">💡 답변</button>
+          </div>
+          <div class="comment-input-row">
+            <textarea class="comment-input" id="cinput-${p.key}" placeholder="질문이나 답변을 남겨보세요" rows="2"></textarea>
+            <button class="comment-submit" onclick="submitComment('${p.key}')">등록</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 댓글 ─────────────────────────────────────────────────────────
+const COMMENT_KEY = 'compare1_comments_v1';
+let commentTypes = {}; // { postKey: 'q' | 'a' }
+
+function getComments() {
+  try { return JSON.parse(localStorage.getItem(COMMENT_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function setCtype(postKey, type) {
+  commentTypes[postKey] = type;
+  const qBtn = document.getElementById(`ctype-q-${postKey}`);
+  const aBtn = document.getElementById(`ctype-a-${postKey}`);
+  if (!qBtn || !aBtn) return;
+  qBtn.className = 'ctype-btn' + (type === 'q' ? ' on-q' : '');
+  aBtn.className = 'ctype-btn' + (type === 'a' ? ' on-a' : '');
+}
+
+function submitComment(postKey) {
+  const input = document.getElementById(`cinput-${postKey}`);
+  const text = input?.value.trim();
+  if (!text) return;
+  const type = commentTypes[postKey] || 'q';
+  const now = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  const comments = getComments();
+  if (!comments[postKey]) comments[postKey] = [];
+  comments[postKey].push({
+    id: Date.now(),
+    type,
+    text,
+    author: myName || '익명',
+    team: teamName || '',
+    time: now
+  });
+  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+  input.value = '';
+  // 댓글 목록만 갱신
+  const list = document.getElementById(`comments-${postKey}`);
+  if (list) list.innerHTML = renderComments(postKey);
+}
+
+function renderComments(postKey) {
+  const comments = getComments();
+  const list = comments[postKey] || [];
+  if (!list.length) return '<span style="font-size:12px;color:#bbb0a0;font-style:italic">아직 댓글이 없어요</span>';
+  return list.map(c => {
+    const badge = c.type === 'q'
+      ? '<span class="comment-type-badge q-badge-c">💬 질문</span>'
+      : '<span class="comment-type-badge a-badge-c">💡 답변</span>';
+    const canDel = isTeacher || c.author === myName;
+    const delBtn = canDel ? `<span class="comment-del" onclick="deleteComment('${postKey}',${c.id})">삭제</span>` : '';
+    return `<div class="comment-item ${c.type}-type">
+      <div class="comment-meta">
+        <span>${badge} <strong>${c.author}</strong> · ${c.team}</span>
+        <span style="display:flex;gap:8px;align-items:center">${c.time} ${delBtn}</span>
+      </div>
+      <div>${c.text}</div>
+    </div>`;
+  }).join('');
+}
+
+function deleteComment(postKey, id) {
+  const comments = getComments();
+  if (!comments[postKey]) return;
+  comments[postKey] = comments[postKey].filter(c => c.id !== id);
+  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+  const list = document.getElementById(`comments-${postKey}`);
+  if (list) list.innerHTML = renderComments(postKey);
+}
+
+function openTeacherLogin() {
+  document.getElementById('teacher-pw').value = '';
+  document.getElementById('teacher-err').textContent = '';
+  document.getElementById('teacher-overlay').classList.add('show');
+  setTimeout(() => document.getElementById('teacher-pw').focus(), 100);
+}
+
+function checkTeacherPw() {
+  if (document.getElementById('teacher-pw').value === TEACHER_PW) {
+    document.getElementById('teacher-overlay').classList.remove('show');
+    isTeacher = true;
+    selGrade = ''; selClass = ''; teamName = ''; myName = '';
+    document.getElementById('nav-label').textContent = '선생님 전체보기 모드';
+    showScreen('screen-main');
+    document.getElementById('btn-write').style.display = 'none';
+    switchTab('board');
+  } else {
+    document.getElementById('teacher-err').textContent = '비밀번호가 틀렸습니다.';
+  }
+}
+
+// 초기화
+initDnD();
+</script>
+</body>
+</html>
